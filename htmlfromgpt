@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jason's To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #input-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        select {
+            padding: 10px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .columns {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            flex: 1;
+            margin: 0 10px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #333333;
+            text-align: center;
+        }
+
+        h3 {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            min-height: 300px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            background-color: #444444;
+            padding: 10px;
+            border: 1px solid #555555;
+            border-radius: 5px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        li:active {
+            cursor: grabbing;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .delete-button {
+            background-color: #ff6347;
+            color: white;
+            padding: 6px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* New Styles for Priority Classification */
+        .important-urgent {
+            background-color: #FF6347;
+        }
+
+        .urgent-not-important {
+            background-color: #FFD700;
+        }
+
+        .important-not-urgent {
+            background-color: #7CFC00;
+        }
+
+        .not-important-not-urgent {
+            background-color: #808080;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Jason's To-Do List</h2>
+
+    <div id="input-container">
+        <input type="text" id="task-input" placeholder="Add new item">
+        <select id="category-select">
+            <option value="home">Home</option>
+            <option value="ggs">GGC</option>
+            <option value="gsu">GSU</option>
+        </select>
+        <select id="priority-select">
+            <option value="important-urgent">Important and Urgent</option>
+            <option value="urgent-not-important">Urgent but Not Important</option>
+            <option value="important-not-urgent">Important but Not Urgent</option>
+            <option value="not-important-not-urgent">Not Important and Not Urgent</option>
+        </select>
+        <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <div class="columns">
+        <div class="column" id="home">
+            <h3>Home</h3>
+            <ul id="home-list" onmousedown="startDrag(event)"></ul>
+        </div>
+
+        <div class="column" id="ggs">
+            <h3>GGC</h3>
+            <ul id="ggs-list" onmousedown="startDrag(event)"></ul>
+        </div>
+
+        <div class="column" id="gsu">
+            <h3>GSU</h3>
+            <ul id="gsu-list" onmousedown="startDrag(event)"></ul>
+        </div>
+    </div>
+
+    <script>
+        function addItem() {
+            var inputValue = document.getElementById("task-input").value;
+            var category = document.getElementById("category-select").value;
+            var priority = document.getElementById("priority-select").value;
+            
+            if (inputValue.trim() !== "") {
+                var li = document.createElement("li");
+                var checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                li.appendChild(checkbox);
+                li.appendChild(document.createTextNode(inputValue));
+                li.setAttribute("draggable", true);
+                li.className = priority;
+                var deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "Delete";
+                deleteButton.className = "delete-button";
+                deleteButton.onclick = function() {
+                    li.parentNode.removeChild(li);
+                };
+                li.appendChild(deleteButton);
+                document.getElementById(category + "-list").appendChild(li);
+                document.getElementById("task-input").value = "";
+            }
+        }
+
+        function startDrag(event) {
+            if (event.target.tagName === 'LI') {
+                event.target.classList.add('dragging');
+                event.dataTransfer.setData('text/plain', null);
+            }
+        }
+
+        document.addEventListener('dragover', function (event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('drop', function (event) {
+            event.preventDefault();
+            var draggedElement = document.querySelector('.dragging');
+            if (draggedElement) {
+                var destinationList = event.target.closest('ul');
+                destinationList.appendChild(draggedElement);
+                draggedElement.classList.remove('dragging');
+            }
+        });
+    </script>
+
+</body>
+</html>
