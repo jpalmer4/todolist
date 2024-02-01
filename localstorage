@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jason's To-Do List</title>
+    <style>
+        <!-- Styles as before -->
+    </style>
+</head>
+<body>
+
+    <h2>Jason's To-Do List</h2>
+
+    <div id="input-container">
+        <input type="text" id="task-input" placeholder="Add new item">
+        <select id="category-select">
+            <option value="home">Home</option>
+            <option value="ggs">GGC</option>
+            <option value="gsu">GSU</option>
+        </select>
+        <select id="priority-select">
+            <option value="important-urgent">Important and Urgent</option>
+            <option value="urgent-not-important">Urgent but Not Important</option>
+            <option value="important-not-urgent">Important but Not Urgent</option>
+            <option value="not-important-not-urgent">Not Important and Not Urgent</option>
+        </select>
+        <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <div class="columns">
+        <div class="column" id="home">
+            <h3>Home</h3>
+            <ul id="home-list" onmousedown="startDrag(event)"></ul>
+        </div>
+
+        <div class="column" id="ggs">
+            <h3>GGC</h3>
+            <ul id="ggs-list" onmousedown="startDrag(event)"></ul>
+        </div>
+
+        <div class="column" id="gsu">
+            <h3>GSU</h3>
+            <ul id="gsu-list" onmousedown="startDrag(event)"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Function to retrieve stored tasks from local storage
+        function getStoredTasks() {
+            return JSON.parse(localStorage.getItem('tasks')) || { home: [], ggs: [], gsu: [] };
+        }
+
+        // Function to save tasks to local storage
+        function saveTasks() {
+            var tasks = {
+                home: Array.from(document.getElementById('home-list').children).map(task => task.innerText),
+                ggs: Array.from(document.getElementById('ggs-list').children).map(task => task.innerText),
+                gsu: Array.from(document.getElementById('gsu-list').children).map(task => task.innerText)
+            };
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Function to load tasks from local storage
+        function loadTasks() {
+            var tasks = getStoredTasks();
+            ['home', 'ggs', 'gsu'].forEach(category => {
+                var list = document.getElementById(`${category}-list`);
+                tasks[category].forEach(task => {
+                    var li = document.createElement('li');
+                    li.appendChild(document.createTextNode(task));
+                    li.setAttribute('draggable', true);
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        // Function to add item
+        function addItem() {
+            // ... (unchanged code for adding an item)
+            saveTasks(); // Save tasks to local storage after adding an item
+        }
+
+        // Function to start drag
+        function startDrag(event) {
+            // ... (unchanged code for starting drag)
+            saveTasks(); // Save tasks to local storage after dragging
+        }
+
+        // Event listener to load tasks when the page loads
+        document.addEventListener('DOMContentLoaded', loadTasks);
+
+        // Event listener to handle dragover and drop events
+        document.addEventListener('dragover', function (event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('drop', function (event) {
+            event.preventDefault();
+            var draggedElement = document.querySelector('.dragging');
+            if (draggedElement) {
+                var destinationList = event.target.closest('ul');
+                destinationList.appendChild(draggedElement);
+                draggedElement.classList.remove('dragging');
+                saveTasks(); // Save tasks to local storage after dropping
+            }
+        });
+    </script>
+
+</body>
+</html>
